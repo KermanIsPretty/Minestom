@@ -63,12 +63,26 @@ public interface BlockHandler {
     }
 
     /**
-     * Warning: Do not change tickable during runtime.
+     * Use {@link #tickable()} instead as the signature is misleading.
+     * <p>
+     * This method is only called when the block is set.
      *
      * @return true if this block should be ticked
      */
+    @Deprecated(forRemoval = true)
     default boolean isTickable() {
         return false;
+    }
+
+    /**
+     * Specifies if this block should be ticked.
+     * <p>
+     * This method is only called when the block is set.
+     *
+     * @return true if this block should be ticked
+     */
+    default boolean tickable() {
+        return isTickable();
     }
 
     /**

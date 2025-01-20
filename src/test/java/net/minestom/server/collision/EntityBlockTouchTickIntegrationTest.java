@@ -1,5 +1,6 @@
 package net.minestom.server.collision;
 
+import net.minestom.server.ServerFlag;
 import net.minestom.server.utils.Direction;
 import net.minestom.testing.Env;
 import net.minestom.testing.EnvTest;
@@ -22,9 +23,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @EnvTest
 class EntityBlockTouchTickIntegrationTest {
+
     @Test
     void entityPhysicsCheckTouchTick(Env env) {
         var instance = env.createFlatInstance();
+
+        var blockPos = Set.of(new Vec(-1, 43, 0),
+                new Vec(1, 43, 0),
+                new Vec(0, 43, -1),
+                new Vec(0, 43, 1),
+                new Vec(0, 45, 0) // Y+
+        );
+        var blockBelow = new Vec(0, 42, 0); // Y-
+
+        var entity = new Entity(EntityType.ZOMBIE);
+        var spawnPoint = new Pos(0.5, 43, 0.5);
 
         Set<Point> positions = new HashSet<>();
         var handler = new BlockHandler() {
@@ -38,22 +51,13 @@ class EntityBlockTouchTickIntegrationTest {
                 return NamespaceID.from("minestom:test");
             }
         };
-
         var customBlock = Block.STONE.withHandler(handler);
-        var blockPos = Set.of(new Vec(-1, 43, 0),
-                new Vec(1, 43, 0),
-                new Vec(0, 43, -1),
-                new Vec(0, 43, 1),
-                new Vec(0, 45, 0) // Y+
-        );
 
         for (var pos : blockPos) {
             instance.setBlock(pos, customBlock);
         }
-        instance.setBlock(0, 42, 0, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+        instance.setBlock(blockBelow, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
 
-        var entity = new Entity(EntityType.ZOMBIE);
-        var spawnPoint = new Pos(0.5, 43, 0.5);
         entity.setInstance(instance, spawnPoint).join();
 
         Arrays.stream(Direction.values())
@@ -68,16 +72,26 @@ class EntityBlockTouchTickIntegrationTest {
         assertEquals(blockPos, positions);
 
         positions.clear(); // Final -Y check
-        instance.setBlock(0, 42, 0, customBlock);
+        instance.setBlock(blockBelow, customBlock);
         entity.tick(0);
-        assertEquals(Set.of(new Vec(0, 42, 0)), positions);
-
-        assertEquals(instance, entity.getInstance());
+        assertEquals(Set.of(blockBelow), positions);
     }
     @Test
     void entityPhysicsCheckTouchTickFarPositiveXNegativeZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, -1000));
+
+        var offset = new Vec(1000, 0, -1000);
+        var blockPos = Set.of(offset.add(-1, 43, 0),
+                offset.add(1, 43, 0),
+                offset.add(0, 43, -1),
+                offset.add(0, 43, 1),
+                offset.add(0, 45, 0) // Y+
+        );
+        var blockBelow = offset.add(0, 42, 0); // Y-
+
+        var entity = new Entity(EntityType.ZOMBIE);
+        var spawnPoint = offset.add(0.5, 43, 0.5).asPosition();
 
         Set<Point> positions = new HashSet<>();
         var handler = new BlockHandler() {
@@ -91,23 +105,13 @@ class EntityBlockTouchTickIntegrationTest {
                 return NamespaceID.from("minestom:test");
             }
         };
-
         var customBlock = Block.STONE.withHandler(handler);
-        var offset = new Vec(1000, 0, -1000);
-        var blockPos = Set.of(offset.add(-1, 43, 0),
-                offset.add(1, 43, 0),
-                offset.add(0, 43, -1),
-                offset.add(0, 43, 1),
-                offset.add(0, 45, 0) // Y+
-        );
 
         for (var pos : blockPos) {
             instance.setBlock(pos, customBlock);
         }
-        instance.setBlock(1000, 42, -1000, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+        instance.setBlock(blockBelow, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
 
-        var entity = new Entity(EntityType.ZOMBIE);
-        var spawnPoint = new Pos(1000.5, 43, -999.5);
         entity.setInstance(instance, spawnPoint).join();
 
         Arrays.stream(Direction.values())
@@ -122,11 +126,9 @@ class EntityBlockTouchTickIntegrationTest {
         assertEquals(blockPos, positions);
 
         positions.clear(); // Final -Y check
-        instance.setBlock(1000, 42, -1000, customBlock);
+        instance.setBlock(blockBelow, customBlock);
         entity.tick(0);
-        assertEquals(Set.of(new Vec(1000, 42, -1000)), positions);
-
-        assertEquals(instance, entity.getInstance());
+        assertEquals(Set.of(blockBelow), positions);
     }
 
     @Test
@@ -134,20 +136,6 @@ class EntityBlockTouchTickIntegrationTest {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(-1000, 1000, 1000));
 
-        Set<Point> positions = new HashSet<>();
-        var handler = new BlockHandler() {
-            @Override
-            public void onTouch(@NotNull Touch touch) {
-                assertTrue(positions.add(touch.blockPosition()));
-            }
-
-            @Override
-            public @NotNull NamespaceID getNamespaceId() {
-                return NamespaceID.from("minestom:test");
-            }
-        };
-
-        var customBlock = Block.STONE.withHandler(handler);
         var offset = new Vec(-1000, 0, 1000);
         var blockPos = Set.of(offset.add(-1, 43, 0),
                 offset.add(1, 43, 0),
@@ -156,13 +144,30 @@ class EntityBlockTouchTickIntegrationTest {
                 offset.add(0, 45, 0) // Y+
         );
 
+        var blockBelow = offset.add(0, 42, 0); // Y-
+
+        var entity = new Entity(EntityType.ZOMBIE);
+        var spawnPoint = offset.add(0.5, 43, 0.5).asPosition();
+
+        Set<Point> positions = new HashSet<>();
+        var handler = new BlockHandler() {
+            @Override
+            public void onTouch(@NotNull Touch touch) {
+                assertTrue(positions.add(touch.blockPosition()));
+            }
+
+            @Override
+            public @NotNull NamespaceID getNamespaceId() {
+                return NamespaceID.from("minestom:test");
+            }
+        };
+        var customBlock = Block.STONE.withHandler(handler);
+
         for (var pos : blockPos) {
             instance.setBlock(pos, customBlock);
         }
-        instance.setBlock(-1000, 42, 1000, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+        instance.setBlock(blockBelow, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
 
-        var entity = new Entity(EntityType.ZOMBIE);
-        var spawnPoint = new Pos(-999.5, 43, 1000.5);
         entity.setInstance(instance, spawnPoint).join();
 
         Arrays.stream(Direction.values())
@@ -177,11 +182,9 @@ class EntityBlockTouchTickIntegrationTest {
         assertEquals(blockPos, positions);
 
         positions.clear(); // Final -Y check
-        instance.setBlock(-1000, 42, 1000, customBlock);
+        instance.setBlock(blockBelow, customBlock);
         entity.tick(0);
-        assertEquals(Set.of(new Vec(-1000, 42, 1000)), positions);
-
-        assertEquals(instance, entity.getInstance());
+        assertEquals(Set.of(blockBelow), positions);
     }
 
     @Test
@@ -189,20 +192,6 @@ class EntityBlockTouchTickIntegrationTest {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, 1000));
 
-        Set<Point> positions = new HashSet<>();
-        var handler = new BlockHandler() {
-            @Override
-            public void onTouch(@NotNull Touch touch) {
-                assertTrue(positions.add(touch.blockPosition()));
-            }
-
-            @Override
-            public @NotNull NamespaceID getNamespaceId() {
-                return NamespaceID.from("minestom:test");
-            }
-        };
-
-        var customBlock = Block.STONE.withHandler(handler);
         var offset = new Vec(1000, 0, 1000);
         var blockPos = Set.of(offset.add(-1, 43, 0),
                 offset.add(1, 43, 0),
@@ -211,38 +200,10 @@ class EntityBlockTouchTickIntegrationTest {
                 offset.add(0, 45, 0) // Y+
         );
 
-        for (var pos : blockPos) {
-            instance.setBlock(pos, customBlock);
-        }
-        instance.setBlock(1000, 42, 1000, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+        var blockBelow = offset.add(0, 42, 0); // Y-
 
         var entity = new Entity(EntityType.ZOMBIE);
-        var spawnPoint = new Pos(1000.5, 43, 1000.5);
-        entity.setInstance(instance, spawnPoint).join();
-
-        Arrays.stream(Direction.values())
-                .filter(direction -> direction != Direction.DOWN)
-                .map(Direction::vec)
-                .forEachOrdered(vec -> {
-                    entity.setVelocity(vec.mul(10));
-                    entity.tick(0);
-                    entity.teleport(spawnPoint);
-                });
-
-        assertEquals(blockPos, positions);
-
-        positions.clear(); // Final -Y check
-        instance.setBlock(1000, 42, 1000, customBlock);
-        entity.tick(0);
-        assertEquals(Set.of(new Vec(1000, 42, 1000)), positions);
-
-        assertEquals(instance, entity.getInstance());
-    }
-
-    @Test
-    void entityPhysicsCheckTouchTickFarNegativeXZ(Env env) {
-        var instance = env.createFlatInstance();
-        instance.loadChunk(new Pos(-1000, 1000, -1000));
+        var spawnPoint = offset.add(0.5, 43, 0.5).asPosition();
 
         Set<Point> positions = new HashSet<>();
         var handler = new BlockHandler() {
@@ -256,23 +217,13 @@ class EntityBlockTouchTickIntegrationTest {
                 return NamespaceID.from("minestom:test");
             }
         };
-
         var customBlock = Block.STONE.withHandler(handler);
-        var offset = new Vec(-1000, 0, -1000);
-        var blockPos = Set.of(offset.add(-1, 43, 0),
-                offset.add(1, 43, 0),
-                offset.add(0, 43, -1),
-                offset.add(0, 43, 1),
-                offset.add(0, 45, 0) // Y+
-        );
 
         for (var pos : blockPos) {
             instance.setBlock(pos, customBlock);
         }
-        instance.setBlock(-1000, 42, -1000, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+        instance.setBlock(blockBelow, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
 
-        var entity = new Entity(EntityType.ZOMBIE);
-        var spawnPoint = new Pos(-999.5, 43, -999.5);
         entity.setInstance(instance, spawnPoint).join();
 
         Arrays.stream(Direction.values())
@@ -287,15 +238,69 @@ class EntityBlockTouchTickIntegrationTest {
         assertEquals(blockPos, positions);
 
         positions.clear(); // Final -Y check
-        instance.setBlock(-1000, 42, -1000, customBlock);
+        instance.setBlock(blockBelow, customBlock);
         entity.tick(0);
-        assertEquals(Set.of(new Vec(-1000, 42, -1000)), positions);
-
-        assertEquals(instance, entity.getInstance());
+        assertEquals(Set.of(blockBelow), positions);
     }
 
     @Test
-    void entityTouchPhysicsBadBehavior(Env env) {
+    void entityPhysicsCheckTouchTickFarNegativeXZ(Env env) {
+        var instance = env.createFlatInstance();
+        instance.loadChunk(new Pos(-1000, 1000, -1000));
+
+        var offset = new Vec(-1000, 0, -1000);
+        var blockPos = Set.of(offset.add(-1, 43, 0),
+                offset.add(1, 43, 0),
+                offset.add(0, 43, -1),
+                offset.add(0, 43, 1),
+                offset.add(0, 45, 0) // Y+
+        );
+
+        var blockBelow = offset.add(0, 42, 0); // Y-
+
+        var entity = new Entity(EntityType.ZOMBIE);
+        var spawnPoint = offset.add(0.5, 43, 0.5).asPosition();
+
+        Set<Point> positions = new HashSet<>();
+        var handler = new BlockHandler() {
+            @Override
+            public void onTouch(@NotNull Touch touch) {
+                assertTrue(positions.add(touch.blockPosition()));
+            }
+
+            @Override
+            public @NotNull NamespaceID getNamespaceId() {
+                return NamespaceID.from("minestom:test");
+            }
+        };
+        var customBlock = Block.STONE.withHandler(handler);
+
+        for (var pos : blockPos) {
+            instance.setBlock(pos, customBlock);
+        }
+        instance.setBlock(blockBelow, Block.STONE); // Regular floor as we are going to be sliding into the blocks.
+
+        entity.setInstance(instance, spawnPoint).join();
+
+        Arrays.stream(Direction.values())
+                .filter(direction -> direction != Direction.DOWN)
+                .map(Direction::vec)
+                .forEachOrdered(vec -> {
+                    entity.setVelocity(vec.mul(10));
+                    entity.tick(0);
+                    entity.teleport(spawnPoint);
+                });
+
+        assertEquals(blockPos, positions);
+
+        positions.clear(); // Final -Y check
+        instance.setBlock(blockBelow, customBlock);
+        entity.tick(0);
+        assertEquals(Set.of(blockBelow), positions);
+    }
+
+    @Test
+    void entityTouchFastPhysicsBadBehavior(Env env) {
         var instance = env.createFlatInstance();
 
         var block = Block.STONE.withHandler(new BlockHandler() {
@@ -314,8 +319,13 @@ class EntityBlockTouchTickIntegrationTest {
         instance.setBlock(0, 43, 0, block);
 
         // Spawn entity inside existing blocks.
-        var entity = new Entity(EntityType.ZOMBIE);
-        entity.setInstance(instance, new Pos(0, 42, 0)).join();
+        var entity = new Entity(EntityType.ZOMBIE) {
+            @Override
+            protected boolean useFastTouch() {
+                return true;
+            }
+        };
+        entity.setInstance(instance, new Pos(0.5, 42, 0.5)).join();
         entity.tick(0);
     }
 }

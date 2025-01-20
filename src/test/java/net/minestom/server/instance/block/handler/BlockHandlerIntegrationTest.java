@@ -15,8 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @EnvTest
 class BlockHandlerIntegrationTest {
@@ -109,14 +108,16 @@ class BlockHandlerIntegrationTest {
             }
 
             @Override
-            public boolean isTickable() {
+            public boolean tickable() {
                 return true;
             }
         };
 
         instance.setBlock(blockPosition, Block.STONE.withHandler(handler));
         // Tick the chunk
-        Objects.requireNonNull(instance.getChunk(4, -4)).tick(0);
+        var chunk = instance.getChunk(4, -4);
+        assertNotNull(chunk);
+        chunk.tick(0);
 
         assertTrue(ticked.get());
     }
