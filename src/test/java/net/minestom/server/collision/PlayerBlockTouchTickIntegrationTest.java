@@ -16,15 +16,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Separate because of how movement is calculated between players and entities.
 // We should expect this bad behavior from the player but not entities. unless the physics engine has gets a controller input vector.
 @EnvTest
-public class PlayerBlockTouchTickIntegrationTest {
+class PlayerBlockTouchTickIntegrationTest {
     @Test
-    public void playerPhysicsCheckTouchTick(Env env) {
+    void playerPhysicsCheckTouchTick(Env env) {
         var instance = env.createFlatInstance();
 
         Set<Point> positions = new HashSet<>();
@@ -75,7 +75,7 @@ public class PlayerBlockTouchTickIntegrationTest {
         assertEquals(instance, player.getInstance());
     }
     @Test
-    public void playerPhysicsCheckTouchTickFarPositiveXNegativeZ(Env env) {
+    void playerPhysicsCheckTouchTickFarPositiveXNegativeZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, -1000));
 
@@ -129,7 +129,7 @@ public class PlayerBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void playerPhysicsCheckTouchTickFarNegativeXPositiveZ(Env env) {
+    void playerPhysicsCheckTouchTickFarNegativeXPositiveZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(-1000, 1000, 1000));
 
@@ -183,7 +183,7 @@ public class PlayerBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void playerPhysicsCheckTouchTickFarPositiveXZ(Env env) {
+    void playerPhysicsCheckTouchTickFarPositiveXZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, 1000));
 
@@ -237,7 +237,7 @@ public class PlayerBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void playerPhysicsCheckTouchTickFarNegativeXZ(Env env) {
+    void playerPhysicsCheckTouchTickFarNegativeXZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(-1000, 1000, -1000));
 
@@ -289,9 +289,9 @@ public class PlayerBlockTouchTickIntegrationTest {
 
         assertEquals(instance, player.getInstance());
     }
-    
+
     @Test
-    public void playerTouchPhysicsTestBadBehavior(Env env) {
+    void playerTouchPhysicsTestBadBehavior(Env env) {
         var instance = env.createFlatInstance();
         var player = env.createPlayer(instance, new Pos(0, 43, 0));
 

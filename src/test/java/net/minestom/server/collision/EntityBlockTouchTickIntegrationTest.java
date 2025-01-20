@@ -21,9 +21,9 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @EnvTest
-public class EntityBlockTouchTickIntegrationTest {
+class EntityBlockTouchTickIntegrationTest {
     @Test
-    public void entityPhysicsCheckTouchTick(Env env) {
+    void entityPhysicsCheckTouchTick(Env env) {
         var instance = env.createFlatInstance();
 
         Set<Point> positions = new HashSet<>();
@@ -75,7 +75,7 @@ public class EntityBlockTouchTickIntegrationTest {
         assertEquals(instance, entity.getInstance());
     }
     @Test
-    public void entityPhysicsCheckTouchTickFarPositiveXNegativeZ(Env env) {
+    void entityPhysicsCheckTouchTickFarPositiveXNegativeZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, -1000));
 
@@ -130,7 +130,7 @@ public class EntityBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void entityPhysicsCheckTouchTickFarNegativeXPositiveZ(Env env) {
+    void entityPhysicsCheckTouchTickFarNegativeXPositiveZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(-1000, 1000, 1000));
 
@@ -185,7 +185,7 @@ public class EntityBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void entityPhysicsCheckTouchTickFarPositiveXZ(Env env) {
+    void entityPhysicsCheckTouchTickFarPositiveXZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(1000, 1000, 1000));
 
@@ -240,7 +240,7 @@ public class EntityBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void entityPhysicsCheckTouchTickFarNegativeXZ(Env env) {
+    void entityPhysicsCheckTouchTickFarNegativeXZ(Env env) {
         var instance = env.createFlatInstance();
         instance.loadChunk(new Pos(-1000, 1000, -1000));
 
@@ -295,7 +295,7 @@ public class EntityBlockTouchTickIntegrationTest {
     }
 
     @Test
-    public void entityTouchPhysicsBadBehavior(Env env) {
+    void entityTouchPhysicsBadBehavior(Env env) {
         var instance = env.createFlatInstance();
 
         var block = Block.STONE.withHandler(new BlockHandler() {

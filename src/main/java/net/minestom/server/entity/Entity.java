@@ -626,7 +626,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
 
         // We can use the cached physics result to avoid recomputing the collision shape positions for entities.
         final ChunkCache cache = new ChunkCache(instance, currentChunk);
-        for (@UnknownNullability Point shapePosition : previousPhysicsResult.collisionShapePositions()) {
+        for (Point shapePosition : previousPhysicsResult.collisionShapePositions()) {
             if (shapePosition == null) continue;
             final Block block = cache.getBlock(shapePosition.blockX(), shapePosition.blockY(), shapePosition.blockZ(), Block.Getter.Condition.CACHED);
             if (block == null) continue;
