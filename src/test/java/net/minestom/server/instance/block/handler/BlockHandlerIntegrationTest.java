@@ -1,7 +1,6 @@
 package net.minestom.server.instance.block.handler;
 
 import net.minestom.server.coordinate.BlockVec;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockFace;
@@ -20,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @EnvTest
-public class BlockHandlerIntegrationTest {
+class BlockHandlerIntegrationTest {
 
     @Test
-    public void testOnPlace(Env env) {
+    void testOnPlace(Env env) {
         var instance = env.createFlatInstance();
         var blockPosition = new BlockVec(-64, 40, 64);
 
@@ -43,7 +42,7 @@ public class BlockHandlerIntegrationTest {
     }
 
     @Test
-    public void testOnDestroy(Env env) {
+    void testOnDestroy(Env env) {
         var instance = env.createFlatInstance();
         var blockPosition = new BlockVec(64, 40, -64);
 
@@ -64,7 +63,7 @@ public class BlockHandlerIntegrationTest {
     }
 
     @Test
-    public void testOnInteract(Env env) {
+    void testOnInteract(Env env) {
         var instance = env.createFlatInstance();
         var blockPosition = new BlockVec(-64, 40, 64);
 
@@ -92,7 +91,7 @@ public class BlockHandlerIntegrationTest {
     }
 
     @Test
-    public void testTick(Env env) {
+    void testTick(Env env) {
         var instance = env.createFlatInstance();
         var blockPosition = new BlockVec(64, 40, -64);
 
