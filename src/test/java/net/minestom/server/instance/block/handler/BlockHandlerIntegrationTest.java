@@ -1,5 +1,6 @@
 package net.minestom.server.instance.block.handler;
 
+import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.PlayerHand;
 import net.minestom.server.instance.block.Block;
@@ -24,7 +25,7 @@ public class BlockHandlerIntegrationTest {
     @Test
     public void testOnPlace(Env env) {
         var instance = env.createFlatInstance();
-        var blockPosition = new Vec(-64, 40, 64);
+        var blockPosition = new BlockVec(-64, 40, 64);
 
         var handler = new BlockHandler() {
             @Override
@@ -44,7 +45,7 @@ public class BlockHandlerIntegrationTest {
     @Test
     public void testOnDestroy(Env env) {
         var instance = env.createFlatInstance();
-        var blockPosition = new Vec(64, 40, -64);
+        var blockPosition = new BlockVec(64, 40, -64);
 
         var handler = new BlockHandler() {
             @Override
@@ -65,7 +66,7 @@ public class BlockHandlerIntegrationTest {
     @Test
     public void testOnInteract(Env env) {
         var instance = env.createFlatInstance();
-        var blockPosition = new Vec(-64, 40, 64);
+        var blockPosition = new BlockVec(-64, 40, 64);
 
         AtomicBoolean interacted = new AtomicBoolean(false);
         var handler = new BlockHandler() {
@@ -83,7 +84,7 @@ public class BlockHandlerIntegrationTest {
         };
 
         instance.setBlock(blockPosition, Block.STONE.withHandler(handler));
-        var player = env.createPlayer(instance, blockPosition.asPosition());
+        var player = env.createPlayer(instance, blockPosition.asVec().asPosition());
         player.addPacketToQueue(new ClientPlayerBlockPlacementPacket(PlayerHand.MAIN, blockPosition, BlockFace.TOP, 0, 0, 0, false, false, 1));
         player.interpretPacketQueue(); // Use packets
 
@@ -93,7 +94,7 @@ public class BlockHandlerIntegrationTest {
     @Test
     public void testTick(Env env) {
         var instance = env.createFlatInstance();
-        var blockPosition = new Vec(64, 40, -64);
+        var blockPosition = new BlockVec(64, 40, -64);
 
         AtomicBoolean ticked = new AtomicBoolean(false);
         var handler = new BlockHandler() {

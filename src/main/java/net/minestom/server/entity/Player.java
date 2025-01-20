@@ -2365,15 +2365,16 @@ public class Player extends LivingEntity implements CommandSender, HoverEventSou
         final Pos position = getPosition();
         final BoundingBox boundingBox = getBoundingBox();
         final ChunkCache cache = new ChunkCache(instance, currentChunk);
+        final double offset = 2 * Vec.EPSILON;
 
         // Create a bounding box that is aligned and slightly bigger to check for collisons.
         final BoundingBox collidingBoundingBox = new BoundingBox(
-                Math.ceil(boundingBox.width()) + 2 * Vec.EPSILON,
-                Math.ceil(boundingBox.height()) + 2 * Vec.EPSILON,
-                Math.ceil(boundingBox.depth()) + 2 * Vec.EPSILON
+                Math.ceil(boundingBox.width()) + offset,
+                Math.ceil(boundingBox.height()) + offset,
+                Math.ceil(boundingBox.depth()) + offset
         );
 
-        // Offset back to center and check for collisions
+        // Offset back and check for collisions
         for (BoundingBox.PointIterator it = collidingBoundingBox.getBlocks(position.sub(Vec.EPSILON)); it.hasNext(); ) {
             var point = it.next();
             final Block block = cache.getBlock(point.blockX(), point.blockY(), point.blockZ(), Block.Getter.Condition.CACHED);
@@ -2381,7 +2382,7 @@ public class Player extends LivingEntity implements CommandSender, HoverEventSou
             final BlockHandler handler = block.handler();
             if (handler == null) continue;
             final Vec blockPos = new Vec(point.blockX(), point.blockY(), point.blockZ());
-            final Point blockEntityVector = blockPos.sub(position).normalize().mul(0.01);
+            final Point blockEntityVector = blockPos.sub(position).normalize().mul(offset);
             final Point modifiedPlayerPosition = position.sub(blockPos).add(blockEntityVector);
             if (!block.registry().collisionShape().intersectBox(modifiedPlayerPosition, boundingBox)) continue;
             handler.onTouch(new BlockHandler.Touch(block, instance, blockPos, this));
