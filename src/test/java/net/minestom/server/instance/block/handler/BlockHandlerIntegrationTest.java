@@ -100,7 +100,7 @@ class BlockHandlerIntegrationTest {
             @Override
             public void tick(@NotNull Tick tick) {
                 ticked.set(true);
-                assertEquals(tick.blockPosition(), blockPosition);
+                assertEquals(tick.blockPosition(), blockPosition.asVec());
             }
 
             @Override
