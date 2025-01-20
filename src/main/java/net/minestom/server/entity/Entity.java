@@ -622,17 +622,47 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
 
     @ApiStatus.Internal
     protected void touchTick() {
-        if (shouldSkipTouchTick()) return;
+        if (shouldSkipTouch()) return;
 
-        // We can use the cached physics result to avoid recomputing the collision shape positions for entities.
-        final ChunkCache cache = new ChunkCache(instance, currentChunk);
-        for (Point shapePosition : previousPhysicsResult.collisionShapePositions()) {
-            if (shapePosition == null) continue;
-            final Block block = cache.getBlock(shapePosition.blockX(), shapePosition.blockY(), shapePosition.blockZ(), Block.Getter.Condition.CACHED);
-            if (block == null) continue;
-            final BlockHandler handler = block.handler();
-            if (handler == null) continue;
-            handler.onTouch(new BlockHandler.Touch(block, instance, shapePosition, this));
+        final Instance instance = getInstance();
+        final ChunkCache cache = new ChunkCache(instance, getChunk());
+
+        if (useFastTouch()) {
+            // We can use the cached physics result to avoid recomputing the collision shape positions for entities.
+            for (Point shapePosition : previousPhysicsResult.collisionShapePositions()) {
+                if (shapePosition == null) continue;
+                final Block block = cache.getBlock(shapePosition.blockX(), shapePosition.blockY(), shapePosition.blockZ(), Block.Getter.Condition.CACHED);
+                if (block == null) continue;
+                final BlockHandler handler = block.handler();
+                if (handler == null) continue;
+                handler.onTouch(new BlockHandler.Touch(block, instance, shapePosition, this));
+            }
+        } else {
+            // Fallback method.
+            final Pos position = getPosition();
+            final BoundingBox boundingBox = getBoundingBox();
+
+            // Create a bounding box that is aligned and slightly bigger to check for collisons.
+            final BoundingBox collidingBoundingBox = new BoundingBox(
+                    boundingBox.width() + 2 * Vec.EPSILON,
+                    boundingBox.height() + 2 * Vec.EPSILON,
+                    boundingBox.depth() + 2 * Vec.EPSILON,
+                    new Vec(-boundingBox.width() / 2 - Vec.EPSILON, -Vec.EPSILON, -boundingBox.depth() / 2 - Vec.EPSILON)
+            );
+
+            // Offset back and check for collisions
+            final BoundingBox.PointIterator pointIterator = collidingBoundingBox.getBlocks(position);
+            while (pointIterator.hasNext()) {
+                final var point = pointIterator.next();
+                final Block block = cache.getBlock(point.blockX(), point.blockY(), point.blockZ(), Block.Getter.Condition.CACHED);
+                if (block == null) continue;
+                final BlockHandler handler = block.handler();
+                if (handler == null) continue;
+                final Vec blockPos = new Vec(point.blockX(), point.blockY(), point.blockZ());
+                final Pos modifiedPlayerPosition = position.sub(blockPos);
+                if (!block.registry().collisionShape().intersectBox(modifiedPlayerPosition, collidingBoundingBox)) continue;
+                handler.onTouch(new BlockHandler.Touch(block, instance, blockPos, this));
+            }
         }
     }
 
@@ -1781,7 +1811,14 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
     /**
      * @return false if {{@link #touchTick()} should be called}
      */
-    protected boolean shouldSkipTouchTick() {
+    protected boolean shouldSkipTouch() {
         return !hasPhysics || (previousPhysicsResult != null && previousPhysicsResult.cached());
+    }
+
+    /**
+     * @return true if can use the fast touch tick which uses the computed physics result.
+     */
+    protected boolean useFastTouch() {
+        return ServerFlag.USE_FAST_TOUCH && !(this instanceof Player);
     }
 }

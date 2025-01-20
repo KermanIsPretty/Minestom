@@ -106,7 +106,7 @@ public class DynamicChunk extends Chunk {
             lastCachedBlock = this.entries.remove(index);
         }
         // Block tick
-        if (handler != null && handler.isTickable()) {
+        if (handler != null && handler.tickable()) {
             this.tickableMap.put(index, block);
         } else {
             this.tickableMap.remove(index);
@@ -186,6 +186,7 @@ public class DynamicChunk extends Chunk {
             final Block block = entry.getValue();
             final BlockHandler handler = block.handler();
             if (handler == null) return;
+            assert handler.tickable(): String.format("You cannot change the tickable state of %s during runtime!", handler.getNamespaceId());
             final Point blockPosition = CoordConversion.chunkBlockIndexGetGlobal(index, chunkX, chunkZ);
             handler.tick(new BlockHandler.Tick(block, instance, blockPosition));
         });
