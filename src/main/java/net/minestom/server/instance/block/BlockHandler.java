@@ -51,7 +51,8 @@ public interface BlockHandler {
 
     /**
      * Defines custom behaviour for entities that touch this block.
-     *
+     * <p>
+     * This method is not continuously called when the entity is not moving.
      *
      * @param touch the contact details
      */
@@ -108,15 +109,39 @@ public interface BlockHandler {
             this.blockPosition = blockPosition;
         }
 
+        /**
+         * Use {@link #block()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Block getBlock() {
             return block;
         }
 
+        /**
+         * Use {@link #instance()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Instance getInstance() {
             return instance;
         }
 
+        /**
+         * Use {@link #blockPosition()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Point getBlockPosition() {
+            return blockPosition;
+        }
+
+        public @NotNull Block block() {
+            return block;
+        }
+
+        public @NotNull Instance instance() {
+            return instance;
+        }
+
+        public @NotNull Point blockPosition() {
             return blockPosition;
         }
     }
@@ -127,42 +152,80 @@ public interface BlockHandler {
         private final Player player;
         private final PlayerHand hand;
         private final BlockFace blockFace;
-        private final float cursorX, cursorY, cursorZ;
+        private final Point cursorPosition;
 
         @ApiStatus.Internal
         public PlayerPlacement(Block block, Instance instance, Point blockPosition,
-                               Player player, PlayerHand hand, BlockFace blockFace, float cursorX, float cursorY, float cursorZ) {
+                               Player player, PlayerHand hand, BlockFace blockFace, Point cursorPosition) {
             super(block, instance, blockPosition);
             this.player = player;
             this.hand = hand;
             this.blockFace = blockFace;
-            this.cursorX = cursorX;
-            this.cursorY = cursorY;
-            this.cursorZ = cursorZ;
+            this.cursorPosition = cursorPosition;
         }
 
+        /**
+         * Use {@link #player()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Player getPlayer() {
             return player;
         }
 
+        /**
+         * Use {@link #hand()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull PlayerHand getHand() {
             return hand;
         }
 
+        /**
+         * Use {@link #blockFace()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull BlockFace getBlockFace() {
             return blockFace;
         }
 
+        /**
+         * Use {@link #cursorPosition()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public float getCursorX() {
-            return cursorX;
+            return (float) cursorPosition.x();
         }
 
+        /**
+         * Use {@link #cursorPosition()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public float getCursorY() {
-            return cursorY;
+            return (float) cursorPosition.y();
         }
 
+        /**
+         * Use {@link #cursorPosition()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public float getCursorZ() {
-            return cursorZ;
+            return (float) cursorPosition.z();
+        }
+
+        public @NotNull Player player() {
+            return player;
+        }
+
+        public @NotNull PlayerHand hand() {
+            return hand;
+        }
+
+        public @NotNull BlockFace blockFace() {
+            return blockFace;
+        }
+
+        public @NotNull Point cursorPosition() {
+            return cursorPosition;
         }
     }
 
@@ -181,15 +244,39 @@ public interface BlockHandler {
             this.blockPosition = blockPosition;
         }
 
+        /**
+         * Use {@link #block()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Block getBlock() {
             return block;
         }
 
+        /**
+         * Use {@link #instance()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Instance getInstance() {
             return instance;
         }
 
+        /**
+         * Use {@link #blockPosition()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Point getBlockPosition() {
+            return blockPosition;
+        }
+
+        public @NotNull Block block() {
+            return block;
+        }
+
+        public @NotNull Instance instance() {
+            return instance;
+        }
+
+        public @NotNull Point blockPosition() {
             return blockPosition;
         }
     }
@@ -206,6 +293,14 @@ public interface BlockHandler {
             this.player = player;
         }
 
+        public @NotNull Player player() {
+            return player;
+        }
+
+        /**
+         * Use {@link #player()} instead.
+         */
+        @Deprecated(forRemoval = true)
         public @NotNull Player getPlayer() {
             return player;
         }
@@ -222,36 +317,57 @@ public interface BlockHandler {
 
         }
 
+        /**
+         * Use {@link #block()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Block getBlock() {
             return block;
         }
 
+        /**
+         * Use {@link #instance()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Instance getInstance() {
             return instance;
         }
 
+        /**
+         * Use {@link #blockFace()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull BlockFace getBlockFace() {
             return blockFace;
         }
 
+        /**
+         * Use {@link #blockPosition()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Point getBlockPosition() {
             return blockPosition;
         }
 
+        /**
+         * Use {@link #cursorPosition()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Point getCursorPosition() {
             return cursorPosition;
         }
 
+        /**
+         * Use {@link #player()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Player getPlayer() {
             return player;
         }
 
+        /**
+         * Use {@link #hand()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull PlayerHand getHand() {
             return hand;
@@ -269,21 +385,33 @@ public interface BlockHandler {
 
         }
 
+        /**
+         * Use {@link #block()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Block getBlock() {
             return block;
         }
 
+        /**
+         * Use {@link #instance()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Instance getInstance() {
             return instance;
         }
 
+        /**
+         * Use {@link #blockPosition()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Point getBlockPosition() {
             return blockPosition;
         }
 
+        /**
+         * Use {@link #touching()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Entity getTouching() {
             return touching;
@@ -300,16 +428,25 @@ public interface BlockHandler {
 
         }
 
+        /**
+         * Use {@link #block()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Block getBlock() {
             return block;
         }
 
+        /**
+         * Use {@link #instance()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Instance getInstance() {
             return instance;
         }
 
+        /**
+         * Use {@link #blockPosition()} instead.
+         */
         @Deprecated(forRemoval = true)
         public @NotNull Point getBlockPosition() {
             return blockPosition;
@@ -321,17 +458,15 @@ public interface BlockHandler {
      * in order to do not lose the information while saving, and for runtime debugging purpose.
      */
     @ApiStatus.Internal
-    final class Dummy implements BlockHandler {
+    record Dummy(@NotNull NamespaceID namespace) implements BlockHandler {
         private static final Map<String, BlockHandler> DUMMY_CACHE = new ConcurrentHashMap<>();
 
         public static @NotNull BlockHandler get(@NotNull String namespace) {
             return DUMMY_CACHE.computeIfAbsent(namespace, Dummy::new);
         }
 
-        private final NamespaceID namespace;
-
-        private Dummy(String name) {
-            namespace = NamespaceID.from(name);
+        private Dummy(@NotNull String name) {
+            this(NamespaceID.from(name));
         }
 
         @Override

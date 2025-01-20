@@ -4,9 +4,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.BlockVec;
 import net.minestom.server.coordinate.CoordConversion;
 import net.minestom.server.coordinate.Point;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockHandler;
@@ -115,13 +115,13 @@ public class DynamicChunk extends Chunk {
         // Update block handlers
         if (lastCachedBlock != null && lastCachedBlock.handler() != null) {
             // Previous destroy
-            var absoluteBlockPosition = new Vec(getChunkX() * 16 + sectionRelativeX, y, getChunkZ() * 16 + sectionRelativeZ);
+            var absoluteBlockPosition = new BlockVec(getChunkX() * CHUNK_SIZE_X + sectionRelativeX, y, getChunkZ() * CHUNK_SIZE_Z + sectionRelativeZ);
             lastCachedBlock.handler().onDestroy(Objects.requireNonNullElseGet(destroy,
                     () -> new BlockHandler.Destroy(lastCachedBlock, instance, absoluteBlockPosition)));
         }
         if (handler != null) {
             // New placement
-            var absoluteBlockPosition = new Vec(getChunkX() * 16 + sectionRelativeX, y, getChunkZ() * 16 + sectionRelativeZ);
+            var absoluteBlockPosition = new BlockVec(getChunkX() * CHUNK_SIZE_X + sectionRelativeX, y, getChunkZ() * CHUNK_SIZE_Z + sectionRelativeZ);
             handler.onPlace(Objects.requireNonNullElseGet(placement,
                     () -> new BlockHandler.Placement(block, instance, absoluteBlockPosition)));
         }

@@ -29,7 +29,7 @@ public class BlockHandlerIntegrationTest {
         var handler = new BlockHandler() {
             @Override
             public void onPlace(@NotNull Placement placement) {
-                assertEquals(blockPosition, placement.getBlockPosition());
+                assertEquals(blockPosition, placement.blockPosition());
             }
 
             @Override
@@ -49,7 +49,7 @@ public class BlockHandlerIntegrationTest {
         var handler = new BlockHandler() {
             @Override
             public void onDestroy(@NotNull Destroy destroy) {
-                assertEquals(blockPosition, destroy.getBlockPosition());
+                assertEquals(blockPosition, destroy.blockPosition());
             }
 
             @Override
