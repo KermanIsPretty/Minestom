@@ -578,7 +578,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
             movementTick();
 
             // handle block contacts
-            touchTick();
+            if (shouldTouch()) touchTick();
 
             // Call the abstract update method
             update(time);
@@ -622,8 +622,6 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
 
     @ApiStatus.Internal
     protected void touchTick() {
-        if (shouldSkipTouch()) return;
-
         final Instance instance = getInstance();
         final ChunkCache cache = new ChunkCache(instance, getChunk());
 
@@ -1809,16 +1807,22 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
     }
 
     /**
-     * @return false if {{@link #touchTick()} should be called}
+     * Called every tick.
+     *
+     * @return true if {@link #touchTick()} should be called.
      */
-    protected boolean shouldSkipTouch() {
-        return !hasPhysics || (previousPhysicsResult != null && previousPhysicsResult.cached());
+    protected boolean shouldTouch() {
+        return hasPhysics && (previousPhysicsResult == null || !previousPhysicsResult.cached());
     }
 
     /**
+     * Specifies if the entity can use fast touch method using the existing physics engine.
+     * <p>
+     * Used in the default implementation of {@link #touchTick()}
+     *
      * @return true if can use the fast touch tick which uses the computed physics result.
      */
     protected boolean useFastTouch() {
-        return ServerFlag.USE_FAST_TOUCH && !(this instanceof Player);
+        return ServerFlag.USE_FAST_TOUCH;
     }
 }

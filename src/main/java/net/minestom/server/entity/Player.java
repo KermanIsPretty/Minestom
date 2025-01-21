@@ -2347,7 +2347,16 @@ public class Player extends LivingEntity implements CommandSender, HoverEventSou
     }
 
     @Override
-    protected boolean shouldSkipTouch() {
-        return gameMode == GameMode.SPECTATOR || super.shouldSkipTouch();
+    protected boolean shouldTouch() {
+        return gameMode != GameMode.SPECTATOR && super.shouldTouch();
+    }
+
+    /*
+      Players are missing the fast touch feature because it is not compatible with the player's.
+      (Missing XZ, +Y from engine)
+     */
+    @Override
+    protected boolean useFastTouch() {
+        return false;
     }
 }
