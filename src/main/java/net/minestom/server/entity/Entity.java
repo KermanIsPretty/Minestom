@@ -643,6 +643,9 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
             // Kind of annoying... they are changing isFastTouch to be true sometimes.
             if (touchBoundingBox == null) {
                 updateTouchBoundingBox(true);
+
+                // Evil is among us.
+                Check.notNull(this.touchBoundingBox, "Touch bounding box is null after force update");
             }
 
             final BoundingBox.PointIterator pointIterator = touchBoundingBox.getBlocks(position);
