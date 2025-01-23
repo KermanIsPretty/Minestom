@@ -3,8 +3,6 @@ package net.minestom.server.collision;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.utils.Direction;
@@ -21,8 +19,14 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Separate because of how movement is calculated between players and entities.
-// We should expect this bad behavior from the player but not entities. unless the physics engine has gets a controller input vector.
+/**
+ * This is really a test between fast and slow touch methods.
+ * As player cannot touch "quickly"
+ * <p>
+ * There is a bad behavior between the two, and it has to do with how entities are in blocks.
+ * We should expect this bad behavior from the player but not entities.
+ * Unless the physics engine gets updated to include a controller input vector.
+ **/
 @EnvTest
 class PlayerBlockTouchTickIntegrationTest {
     @Test
