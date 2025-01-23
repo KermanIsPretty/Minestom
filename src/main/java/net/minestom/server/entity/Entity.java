@@ -107,6 +107,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
     protected boolean onGround;
 
     protected BoundingBox boundingBox;
+    protected @Nullable BoundingBox touchBoundingBox = null; // Should be updated by #updateTouchBoundingBox only.
     private PhysicsResult previousPhysicsResult = null;
 
     protected Entity vehicle;
@@ -578,7 +579,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
             movementTick();
 
             // handle block contacts
-            if (shouldTouch()) touchTick();
+            if (isTickingTouch()) touchTick();
 
             // Call the abstract update method
             update(time);
@@ -625,7 +626,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
         final Instance instance = getInstance();
         final ChunkCache cache = new ChunkCache(instance, getChunk());
 
-        if (useFastTouch()) {
+        if (isFastTouch()) {
             // We can use the cached physics result to avoid recomputing the collision shape positions for entities.
             for (Point shapePosition : previousPhysicsResult.collisionShapePositions()) {
                 if (shapePosition == null) continue;
@@ -636,20 +637,15 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
                 handler.onTouch(new BlockHandler.Touch(block, instance, shapePosition, this));
             }
         } else {
-            // Fallback method.
+            // Fallback method, always this path for players.
             final Pos position = getPosition();
-            final BoundingBox boundingBox = getBoundingBox();
 
-            // Create a bounding box that is aligned and slightly bigger to check for collisons.
-            final BoundingBox collidingBoundingBox = new BoundingBox(
-                    boundingBox.width() + 2 * Vec.EPSILON,
-                    boundingBox.height() + 2 * Vec.EPSILON,
-                    boundingBox.depth() + 2 * Vec.EPSILON,
-                    new Vec(-boundingBox.width() / 2 - Vec.EPSILON, -Vec.EPSILON, -boundingBox.depth() / 2 - Vec.EPSILON)
-            );
+            // Kind of annoying... they are changing isFastTouch to be true sometimes.
+            if (touchBoundingBox == null) {
+                updateTouchBoundingBox(true);
+            }
 
-            // Offset back and check for collisions
-            final BoundingBox.PointIterator pointIterator = collidingBoundingBox.getBlocks(position);
+            final BoundingBox.PointIterator pointIterator = touchBoundingBox.getBlocks(position);
             while (pointIterator.hasNext()) {
                 final var point = pointIterator.next();
                 final Block block = cache.getBlock(point.blockX(), point.blockY(), point.blockZ(), Block.Getter.Condition.CACHED);
@@ -658,7 +654,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
                 if (handler == null) continue;
                 final Vec blockPos = new Vec(point.blockX(), point.blockY(), point.blockZ());
                 final Pos modifiedPlayerPosition = position.sub(blockPos);
-                if (!block.registry().collisionShape().intersectBox(modifiedPlayerPosition, collidingBoundingBox)) continue;
+                if (!block.registry().collisionShape().intersectBox(modifiedPlayerPosition, touchBoundingBox)) continue;
                 handler.onTouch(new BlockHandler.Touch(block, instance, blockPos, this));
             }
         }
@@ -763,6 +759,9 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
      */
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
+
+        // Update the touch bounding box
+        updateTouchBoundingBox(false);
     }
 
     /**
@@ -1175,6 +1174,9 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
      */
     public void setPose(@NotNull EntityPose pose) {
         this.entityMeta.setPose(pose);
+
+        // Pose can change the hitbox, update, even if its a waste.
+        updateTouchBoundingBox(false);
     }
 
     protected void updatePose() {
@@ -1811,7 +1813,7 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
      *
      * @return true if {@link #touchTick()} should be called.
      */
-    protected boolean shouldTouch() {
+    protected boolean isTickingTouch() {
         return hasPhysics && (previousPhysicsResult == null || !previousPhysicsResult.cached());
     }
 
@@ -1822,7 +1824,22 @@ public class Entity implements Viewable, Tickable, Schedulable, Snapshotable, Ev
      *
      * @return true if can use the fast touch tick which uses the computed physics result.
      */
-    protected boolean useFastTouch() {
+    protected boolean isFastTouch() {
         return ServerFlag.USE_FAST_TOUCH;
+    }
+
+    /**
+     * Cache of updating the touch bounding box, currently only used when {@link #isFastTouch()} is false.
+     * <p>
+     * Under normal use, you shouldn't have to override this method.
+     * Already called in {@link #setPose(EntityPose)} and {@link #setBoundingBox(BoundingBox)}.
+     * @param force if the bounding box should be updated even if {@link #isFastTouch()} is true
+     */
+    protected void updateTouchBoundingBox(boolean force) {
+        if (force || !isFastTouch()) {
+            this.touchBoundingBox = getBoundingBox().grow(Vec.EPSILON, Vec.EPSILON, Vec.EPSILON);
+        } else if (touchBoundingBox != null) {
+            this.touchBoundingBox = null;
+        }
     }
 }

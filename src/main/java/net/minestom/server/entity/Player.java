@@ -2347,8 +2347,8 @@ public class Player extends LivingEntity implements CommandSender, HoverEventSou
     }
 
     @Override
-    protected boolean shouldTouch() {
-        return gameMode != GameMode.SPECTATOR && super.shouldTouch();
+    protected boolean isTickingTouch() {
+        return gameMode != GameMode.SPECTATOR && super.isTickingTouch();
     }
 
     /*
@@ -2356,7 +2356,7 @@ public class Player extends LivingEntity implements CommandSender, HoverEventSou
       (Missing XZ, +Y from engine)
      */
     @Override
-    protected boolean useFastTouch() {
+    protected boolean isFastTouch() {
         return false;
     }
 }

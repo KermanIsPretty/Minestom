@@ -321,7 +321,7 @@ class EntityBlockTouchTickIntegrationTest {
         // Spawn entity inside existing blocks.
         var entity = new Entity(EntityType.ZOMBIE) {
             @Override
-            protected boolean useFastTouch() {
+            protected boolean isFastTouch() {
                 return true;
             }
         };
