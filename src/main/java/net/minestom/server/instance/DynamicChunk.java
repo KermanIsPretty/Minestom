@@ -186,7 +186,10 @@ public class DynamicChunk extends Chunk {
             final Block block = entry.getValue();
             final BlockHandler handler = block.handler();
             if (handler == null) return;
-            assert handler.tickable(): String.format("You cannot change the tickable state of %s during runtime!", handler.getNamespaceId());
+            // We cannot throw an exception as that could cause other blocks to not get properly ticked.
+            if (!handler.tickable()) {
+                LOGGER.warn("Ticking a block {} using the handler {}, but it is no longer considered tickable. Previously, it was tickable, but this is unsupported since tickable is immutable.", block, handler);
+            }
             final Point blockPosition = CoordConversion.chunkBlockIndexGetGlobal(index, chunkX, chunkZ);
             handler.tick(new BlockHandler.Tick(block, instance, blockPosition));
         });

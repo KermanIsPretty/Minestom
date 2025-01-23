@@ -75,9 +75,9 @@ public interface BlockHandler {
     }
 
     /**
-     * Specifies if this block should be ticked.
+     * Specifies if this block should be ticked, this is immutable after the block is set.
      * <p>
-     * This method is only called when the block is set.
+     * This method is only called during the block set and later to check immutability.
      *
      * @return true if this block should be ticked
      */
